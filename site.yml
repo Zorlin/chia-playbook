@@ -1,7 +1,11 @@
 ---
+# Thanks to https://www.middlewareinventory.com/blog/ansible-ssh-key-exchange/#Ansible_Playbook_to_Exchange_keys_between_hosts
+# for some ideas
+
 - name: Chia
-  hosts: plotters
+  hosts: plotter
   become: true
+  remote_user: chia
 
   vars_files:
     - "vars/chia.yml"
@@ -13,3 +17,37 @@
           - sshfs
           - mergerfs
         state: present
+
+    - name: Destroy temp file
+      file:
+        path: /home/chia/.ssh/id_rsa
+        state: absent
+
+    - name: Destroy temp file
+      file:
+        path: /home/chia/.ssh/id_rsa.pub
+        state: absent
+
+    - name: Generate keys on each machine
+      openssh_keypair:
+        path: /home/chia/.ssh/id_rsa
+      become: no
+
+    - name: Fetch the keyfile from one server to another
+      tags: run
+      fetch:
+        src: "~/.ssh/id_rsa.pub"
+        dest: "buffer/{{ansible_hostname}}-id_rsa.pub"
+        flat: yes
+      become: no
+
+    - name: Copy the key add to authorized_keys using Ansible module
+      tags: run
+      authorized_key:
+        user: chia
+        state: present
+        key: "{{ lookup('file','buffer/{{item.dest}}-id_rsa.pub')}}"
+      when: "{{ item.dest != ansible_hostname }}"
+      with_items:
+        - { dest: "{{groups['app'][1]}}"}
+        - { dest: "{{groups['app'][0]}}"}
