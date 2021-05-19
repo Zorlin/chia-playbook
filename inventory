@@ -1,0 +1,18 @@
+[node]
+chiabig ansible_host=10.1.8.93
+
+[farmer]
+chiabig ansible_host=10.1.8.93
+
+[harvester]
+chia1 ansible_host=10.1.6.87
+chia2 ansible_host=10.1.9.219
+chia3 ansible_host=10.1.6.191
+chia4 ansible_host=10.1.9.187
+chia5 ansible_host=10.1.6.238
+chia6 ansible_host=10.1.2.18
+chia7 ansible_host=10.1.7.252
+chia8 ansible_host=10.1.2.53
+
+[plotter]
+chiabig ansible_host=10.1.8.93

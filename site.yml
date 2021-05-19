@@ -1,0 +1,15 @@
+---
+- name: Chia
+  hosts: plotters
+  become: true
+
+  vars_files:
+    - "vars/chia.yml"
+
+  tasks:
+    - name: Install sshfs and mergerfs
+      package:
+        name:
+          - sshfs
+          - mergerfs
+        state: present
